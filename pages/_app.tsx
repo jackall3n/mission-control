@@ -57,7 +57,7 @@ function App({ Component }) {
   return (
     <ApplicationsProvider applications={applications} environments={environments}>
       <Header />
-      <div className="App">
+      <div className="App dark">
         <Menu />
         <div className="Page">
           <div className="flex">

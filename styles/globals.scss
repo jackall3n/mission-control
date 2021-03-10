@@ -6,7 +6,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: var(--bg-grey);
-  color: #3a3a3a;
+  color: var(--main-text-color);
 }
 
 code {
@@ -24,6 +24,17 @@ html, body, #__next {
 .App {
   display: flex;
   flex: 1;
+}
+
+h1 {
+  display: flex;
+  align-items: center;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.75rem;
+  }
 }
 
 .Page {
@@ -73,7 +84,7 @@ footer {
 
 .Application {
   display: flex;
-  padding: 1.25rem;
+  padding: 1rem;
   color: #222;
   flex: 1;
   text-decoration: none;
@@ -84,7 +95,7 @@ footer {
     align-items: center;
 
     h2 {
-      background: #ff9090;
+      //background: #ff9090;
       color: #641e1e;
       font-size: 0.9rem;
       padding: 0.375rem 0.625rem;
@@ -296,8 +307,30 @@ $animation-time: 750ms;
 }
 
 :root {
+  --background: white;
+  --main-text-color: #3a3a3a;
+
+  --tile-background: white;
+  --tile-border: rgb(235, 237, 240);
+  --tile-chip-background-color: #f6f6f6;
+
   --dashboard-border: #eeeeee;
   --bg-grey: rgb(245, 246, 250);
   --main-blue: rgb(65, 129, 254);
   --border-grey: rgb(235, 237, 240);
 }
+
+//@media (prefers-color-scheme: dark) {
+//  :root {
+//    --background: #222222;
+//    --main-text-color: white;
+//
+//    --tile-background: #222222;
+//    --tile-border: rgb(55, 55, 55);
+//    --tile-chip-background-color: #262626;
+//
+//    --dashboard-border: #222222;
+//    --bg-grey: #222222;
+//    --border-grey: #414141;
+//  }
+//}

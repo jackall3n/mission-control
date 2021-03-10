@@ -8,10 +8,10 @@
 .navigation {
   display: flex;
   margin-top: 2rem;
+  flex-direction: column;
 
   a {
     display: flex;
-    flex: 1;
     align-items: center;
     padding-left: 2.5rem;
     text-transform: uppercase;

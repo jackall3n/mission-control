@@ -4,14 +4,14 @@ import qs from 'querystring';
 export enum APP_TYPE {
   CUSTOMER_WEB = 'customer-web',
   POLICY_ADMIN = 'policy-admin',
-  // PRODUCT_API = 'PRODUCT_API',
-  // QUOTE_API = 'QUOTE_API',
-  // BILLING_API = 'BILLING_API',
-  // FEATURE_API = 'FEATURE_API',
-  // POLICY_API = 'POLICY_API',
-  // SANCTION_API = 'SANCTION_API',
-  // DOCUMENT_API = 'DOCUMENT_API',
-  // RATING_API = 'RATING_API'
+  PRODUCT_API = 'product-api',
+  QUOTE_API = 'quote-api',
+  BILLING_API = 'billing-api',
+  FEATURE_API = 'feature-api',
+  POLICY_API = 'policy-api',
+  SANCTION_API = 'sanction-api',
+  DOCUMENT_API = 'document-api',
+  RATING_API = 'rating-api'
 }
 
 export interface IApplicationBase {
@@ -154,7 +154,7 @@ export function ApplicationsProvider({ applications, children, environments }: R
     console.log(app.configuration);
     console.groupEnd();
 
-    const failed = Boolean(Object.values(app.configuration).length === 0);
+    const failed = Boolean(Object.values(app.configuration ?? {}).length === 0);
 
     setApps(apps => ({
       ...apps,

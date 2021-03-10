@@ -1,7 +1,3 @@
-.page {
-  margin: 3rem;
-  flex: 1;
-}
 
 .container {
   display: grid;
@@ -56,6 +52,18 @@
   //border-top-left-radius: 7px;
   //border-top-right-radius: 7px;
   color: rgb(160, 174, 207);
+
+  display: flex;
+  align-items: center;
+
+  svg {
+    height: 16px;
+    margin-left: 0.25rem;
+
+    path {
+      fill: rgb(115, 128, 155);
+    }
+  }
 }
 
 .application_environments {
@@ -72,16 +80,14 @@
   border: 2px solid rgb(235, 237, 240);
   border-radius: 5px;
   overflow: hidden;
+  display: flex;
 
   &:hover {
     background: #f6f6f6;
-    color: red;
   }
 
-  &:last-of-type {
-  }
-
-  &:first-of-type {
+  &[data-failed="true"] {
+    border-color: #f39393;
   }
 }
 

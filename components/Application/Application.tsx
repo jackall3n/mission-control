@@ -23,7 +23,7 @@ function Application({ application, environment, configuration }: Props) {
   if (configuration?.failed) {
     return (
       <a className="Application failed" href={url} target="_blank">
-        <h2 className="Application-version">Error</h2>
+        <h2>Error</h2>
       </a>
     )
   }
@@ -42,10 +42,10 @@ function Application({ application, environment, configuration }: Props) {
       <a className="Application" href={url} target="_blank">
         <sub><DateFormat value={startupDate} format="dd MMM, HH:mm" /></sub>
         <h2 className="Application-version">{moduleVersion ?? module?.version ?? "(not provided)"}</h2>
-        {/*<small>Image: <a target="_blank" href={githubUrl}>{version}</a></small>*/}
-        {/*<small>Steps: <a target="_blank" href={stepsUrl}>{steps.version}</a></small>*/}
-        {/*<small>Translations: <a target="_blank" href={translationsUrl}>{translations.version}</a></small>*/}
-        {/*<small>Documents: <a target="_blank" href={documentsUrl}>{documents.version}</a></small>*/}
+        <small>Image: <a target="_blank" href={githubUrl}>{version}</a></small>
+        <small>Steps: <a target="_blank" href={stepsUrl}>{steps.version}</a></small>
+        <small>Translations: <a target="_blank" href={translationsUrl}>{translations.version}</a></small>
+        <small>Documents: <a target="_blank" href={documentsUrl}>{documents.version}</a></small>
       </a>
     )
   }
@@ -60,7 +60,7 @@ function Application({ application, environment, configuration }: Props) {
       <a className="Application" href={url} target="_blank">
         <sub><DateFormat value={startupDate} format="dd MMM, HH:mm" /></sub>
         <h2 className="Application-version">{moduleVersion ?? module?.version ?? "(not provided)"}</h2>
-        {/*<small>Image: <a target="_blank" href={githubUrl}>{version}</a></small>*/}
+        <small>Image: <a target="_blank" href={githubUrl}>{version}</a></small>
       </a>
     )
   }

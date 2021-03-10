@@ -59,7 +59,11 @@ function App({ Component }) {
       <Header />
       <div className="App">
         <Menu />
-        <Component />
+        <div className="Page">
+          <div className="flex">
+            <Component />
+          </div>
+        </div>
       </div>
       {applications.map(app => (
         <ApplicationOverview

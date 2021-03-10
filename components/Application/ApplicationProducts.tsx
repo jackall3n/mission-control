@@ -47,9 +47,15 @@ function ApplicationProducts({ application }: Props) {
               </strong>
               <span>=</span>
               <code className="url">
-                <a href={`${application.url}/product/${id}/quote`}
+                <a href={`${application.url}/product/${id}/quote?force=true`}
                    target="_blank"
                    rel="noreferrer">{description}</a>
+                {' '}
+                {environment === "dev0" && (
+                  <a href={`http://localhost:3000/int/product/${id}/quote?force=true`}
+                     target="_blank"
+                     rel="noreferrer">(local)</a>
+                )}
               </code>
             </div>
           )

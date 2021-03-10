@@ -40,12 +40,12 @@ function Application({ application, environment, configuration }: Props) {
 
     return (
       <a className="Application" href={url} target="_blank">
+        <sub><DateFormat value={startupDate} format="dd MMM, HH:mm" /></sub>
         <h2 className="Application-version">{moduleVersion ?? module?.version ?? "(not provided)"}</h2>
-        <sub><DateFormat value={startupDate} format="dd MMM HH:mm" /></sub>
-        <small>Image: <a target="_blank" href={githubUrl}>{version}</a></small>
-        <small>Steps: <a target="_blank" href={stepsUrl}>{steps.version}</a></small>
-        <small>Translations: <a target="_blank" href={translationsUrl}>{translations.version}</a></small>
-        <small>Documents: <a target="_blank" href={documentsUrl}>{documents.version}</a></small>
+        {/*<small>Image: <a target="_blank" href={githubUrl}>{version}</a></small>*/}
+        {/*<small>Steps: <a target="_blank" href={stepsUrl}>{steps.version}</a></small>*/}
+        {/*<small>Translations: <a target="_blank" href={translationsUrl}>{translations.version}</a></small>*/}
+        {/*<small>Documents: <a target="_blank" href={documentsUrl}>{documents.version}</a></small>*/}
       </a>
     )
   }
@@ -58,9 +58,9 @@ function Application({ application, environment, configuration }: Props) {
 
     return (
       <a className="Application" href={url} target="_blank">
+        <sub><DateFormat value={startupDate} format="dd MMM, HH:mm" /></sub>
         <h2 className="Application-version">{moduleVersion ?? module?.version ?? "(not provided)"}</h2>
-        <sub><DateFormat value={startupDate} format="dd MMM HH:mm" /></sub>
-        <small>Image: <a target="_blank" href={githubUrl}>{version}</a></small>
+        {/*<small>Image: <a target="_blank" href={githubUrl}>{version}</a></small>*/}
       </a>
     )
   }

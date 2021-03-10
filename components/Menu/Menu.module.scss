@@ -1,0 +1,42 @@
+.menu {
+  background-color: white;
+  width: 250px;
+  flex-shrink: 0;
+  border-right: 1.5px solid var(--border-grey);
+}
+
+.navigation {
+  display: flex;
+  margin-top: 2rem;
+
+  a {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    padding-left: 2.5rem;
+    text-transform: uppercase;
+    color: #222;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 700;
+    height: 45px;
+    border-right: 3px solid transparent;
+    margin-right: -1px;
+
+    svg {
+      margin-right: 1rem;
+      width: 24px;
+      height: 24px;
+    }
+
+    &:visited {
+      color: inherit;
+    }
+
+    &[data-active="true"] {
+      svg path {
+        fill: var(--main-blue);
+      }
+    }
+  }
+}

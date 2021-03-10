@@ -4,6 +4,8 @@ import ApplicationsProvider, { APP_TYPE, IApplication } from "../providers/Appli
 import '../styles/globals.scss';
 import { useRouter } from "next/router";
 import ApplicationOverview from "../components/Application/ApplicationOverview";
+import Header from '../components/Header/Header';
+import Menu from '../components/Menu/Menu';
 
 function createApplication(type: APP_TYPE, environment: string, url: string, poll = true): IApplication {
   return {
@@ -54,7 +56,9 @@ function App({ Component }) {
 
   return (
     <ApplicationsProvider applications={applications} environments={environments}>
+      <Header />
       <div className="App">
+        <Menu />
         <Component />
       </div>
       {applications.map(app => (

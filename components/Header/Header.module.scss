@@ -1,0 +1,42 @@
+.header {
+  background: white;
+  height: 54px;
+  display: flex;
+  padding: 0 2rem;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  font-weight: 800;
+  justify-content: space-between;
+  border-bottom: 1.5px solid var(--border-grey);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+
+  svg {
+    height: 20px;
+    width: 20px;
+    margin-right: 0.65rem;
+
+    path {
+      fill: var(--main-blue);
+    }
+  }
+}
+
+.lastUpdated {
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+
+  b {
+    margin-right: 0.25rem;
+  }
+
+  svg {
+    height: 14px;
+    margin-left: 0.25rem;
+  }
+}

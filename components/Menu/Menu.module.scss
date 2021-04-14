@@ -1,8 +1,14 @@
+@import "styles/media";
+
 .menu {
   background-color: var(--background);
   width: 250px;
   flex-shrink: 0;
   border-right: 1.5px solid var(--border-grey);
+
+  @include media(1250px) {
+    display: none;
+  }
 }
 
 .navigation {

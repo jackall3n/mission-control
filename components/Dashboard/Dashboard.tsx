@@ -1,7 +1,8 @@
 import React from 'react';
-import Link from "next/link";
 import styles from './Dashboard.module.scss';
 import { APP_TYPE, useApplications } from "../../providers/ApplicationsProvider";
+import { groupBy } from 'lodash';
+import Link from 'next/link';
 import Application from '../Application/Application';
 
 const APPS = Object.values(APP_TYPE).map(type => ({
@@ -23,14 +24,6 @@ function Dashboard() {
         <span>Dashboard</span>
       </h1>
       <div className={styles.container} style={{ gridTemplateColumns: `repeat(${environments.length}, 1fr)` }}>
-
-        {/* ENVIRONMENTS */}
-        <div className={styles.environments}>
-          {environments.map(environment => (
-            <div key={environment} className={styles.environment} data-environment={environment}>{environment}</div>
-          ))}
-        </div>
-
         {/* APPLICATIONS */}
         {APPS.map(app => (
           <div className={styles.application_row} key={app.id}>
@@ -44,28 +37,56 @@ function Dashboard() {
               {/*</div>*/}
             </div>
             <div className={styles.application_environments}>
-              {environments.map(environment => {
-                const application = Object.values(applications).find(a => a.environment === environment && a.type === app.type);
+              {Object.entries(groupBy(environments, e => {
+                if (e === "prod0") {
+                  return e;
+                }
+
+                return e.replace(/[^A-Za-z]/gmi, '');
+              })).map(([environmentType, environments]) => {
 
                 return (
-                  <React.Fragment key={environment}>
-                    <Link href={{
-                      query: {
-                        application: app.type,
-                        environment: environment
-                      }
-                    }}>
-                      <div className={styles.application}
-                           data-environment={environment}
-                           data-failed={application?.failed}>
-                        <div className={styles.application_environment} data-failed={application?.failed}>{environment}</div>
-                        <Application application={app} environment={environment} configuration={application} />
-                      </div>
-                    </Link>
-                  </React.Fragment>
+                  <div data-environment-type={environmentType} key={environmentType}
+                       className={styles.environment_type}
+                       style={{
+                         gridColumn: `span ${environments.length}`,
+                         gridTemplateColumns: `repeat(${environments.length}, 1fr)`
+                       }}
+                  >
+                    <>
+                      {environments.map((environment, index) => {
+                        const application = Object.values(applications).find(a => a.environment === environment && a.type === app.type);
+
+                        return (
+                          <React.Fragment key={environment}>
+                            <Link href={{
+                              query: {
+                                application: app.type,
+                                environment: environment
+                              }
+                            }}>
+                              <div className={styles.application}
+                                   data-environment={environment}
+                                   data-environment-type={environment.replace(/[^A-Za-z]/gmi, '')}
+                                   data-environment-sub={!environment.includes('0') && environment !== 'prod1'}
+                                   data-failed={application?.failed}
+                                   style={{
+                                     transform: `translate(${index * 0.325}rem, ${index * 0.325}rem)`,
+                                     zIndex: 5 - index
+                                   }}
+                              >
+                                <div className={styles.application_environment}
+                                     data-failed={application?.failed}>{environment}</div>
+                                <Application application={app} environment={environment} configuration={application} />
+                              </div>
+                            </Link>
+                          </React.Fragment>
+                        )
+                      })}
+                    </>
+                  </div>
                 )
-              })
-              }
+              })}
             </div>
             <div className={styles.application_row_spacer} />
           </div>
@@ -74,6 +95,54 @@ function Dashboard() {
       </div>
     </div>
   )
+}
+
+{/*{environments.map(environment => {*/
+}
+{/*  const application = Object.values(applications).find(a => a.environment === environment && a.type === app.type);*/
+}
+
+{/*  return (*/
+}
+{/*    <React.Fragment key={environment}>*/
+}
+{/*      <Link href={{*/
+}
+{/*        query: {*/
+}
+{/*          application: app.type,*/
+}
+{/*          environment: environment*/
+}
+{/*        }*/
+}
+{/*      }}>*/
+}
+{/*        <div className={styles.application}*/
+}
+{/*             data-environment={environment}*/
+}
+{/*             data-environment-type={environment.replace(/[^A-Za-z]/gmi, '')}*/
+}
+{/*             data-environment-sub={!environment.includes('0')}*/
+}
+{/*             data-failed={application?.failed}>*/
+}
+{/*          <div className={styles.application_environment}*/
+}
+{/*               data-failed={application?.failed}>{environment}</div>*/
+}
+{/*          <Application application={app} environment={environment} configuration={application} />*/
+}
+{/*        </div>*/
+}
+{/*      </Link>*/
+}
+{/*    </React.Fragment>*/
+}
+{/*  )*/
+}
+{/*})*/
 }
 
 export default Dashboard;

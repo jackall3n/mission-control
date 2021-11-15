@@ -4,14 +4,30 @@ import qs from 'querystring';
 export enum APP_TYPE {
   CUSTOMER_WEB = 'customer-web',
   POLICY_ADMIN = 'policy-admin',
-  PRODUCT_API = 'product-api',
-  QUOTE_API = 'quote-api',
-  BILLING_API = 'billing-api',
-  FEATURE_API = 'feature-api',
-  POLICY_API = 'policy-api',
-  SANCTION_API = 'sanction-api',
-  DOCUMENT_API = 'document-api',
-  RATING_API = 'rating-api'
+  GQL_GATEWAY = 'gql-gateway',
+  // PRODUCT_API = 'product-api',
+  // QUOTE_API = 'quote-api',
+  // BILLING_API = 'billing-api',
+  // FEATURE_API = 'feature-api',
+  // POLICY_API = 'policy-api',
+  // SANCTION_API = 'sanction-api',
+  // DOCUMENT_API = 'document-api',
+  // RATING_API = 'rating-api'
+}
+
+export interface IMetadataDetails {
+  name: string;
+  value: string;
+  showOnDeploymentCard?: boolean;
+  link?: string;
+}
+
+export interface IMetadata {
+  module: string;
+  region: string;
+  api?: string;
+  details?: IMetadataDetails[];
+  environment: string;
 }
 
 export interface IApplicationBase {
@@ -19,21 +35,20 @@ export interface IApplicationBase {
   url: string;
   environment: string;
   poll: boolean;
-  failed: boolean;
+  error?: string;
+  metadata?: IMetadata;
+  updated?: Date;
 }
 
 export interface ICustomerWebApplication extends IApplicationBase {
   type: APP_TYPE.CUSTOMER_WEB;
-  configuration: ICustomerWebConfiguration;
 }
 
 export interface IPolicyAdminApplication extends IApplicationBase {
   type: APP_TYPE.POLICY_ADMIN;
-  configuration: IPolicyAdminConfiguration
 }
 
 export interface IApiApplication extends IApplicationBase {
-  configuration?: any;
 }
 
 export type IApplication = ICustomerWebApplication | IPolicyAdminApplication | IApiApplication;
@@ -41,40 +56,6 @@ export type IApplication = ICustomerWebApplication | IPolicyAdminApplication | I
 export type IRepo = {
   deployments: any[];
   modules: any[];
-}
-
-export type ICustomerWebConfiguration = {
-  environment: string;
-  version: string;
-  moduleVersion?: string;
-  startupDate: string;
-  buildDate: string;
-  steps: {
-    version: string;
-  };
-  translations: {
-    version: string;
-  };
-  documents: {
-    version: string;
-  }
-}
-
-export type IPolicyAdminConfiguration = {
-  environment: string;
-  version: string;
-  moduleVersion?: string;
-  startupDate: string;
-  buildDate: string;
-  steps: {
-    version: string;
-  };
-  translations: {
-    version: string;
-  };
-  documents: {
-    version: string;
-  }
 }
 
 export type IApplicationsContext = {
@@ -128,21 +109,26 @@ export function ApplicationsProvider({ applications, children, environments }: R
     }
 
     try {
-      const url = `${application.url}/configuration.json`;
+      const url = `${application.url}/metadata`;
       const response = await fetch(`/api/load?${qs.stringify({ url })}`);
 
-      const configuration = await response.json();
+      const metadata = await response.json();
+
+      console.log(application, { metadata });
 
       return {
         ...application,
-        configuration
+        error: undefined,
+        metadata,
+        updated: new Date()
       }
     } catch (error) {
       console.error(error);
 
       return {
         ...application,
-        configuration: {} as any
+        error: error.message,
+        updated: new Date()
       }
     } finally {
       console.groupEnd();

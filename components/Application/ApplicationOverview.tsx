@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { APP_TYPE, useApplication } from "../../providers/ApplicationsProvider";
 import Overlay from '../Overlay/Overlay';
 import { CSSTransition } from 'react-transition-group'
@@ -15,9 +15,11 @@ function ApplicationOverview({ application: type, environment, show }: Props) {
   const { push } = useRouter();
   const application = useApplication(type, environment);
 
-  if (show) {
-    console.log(application);
-  }
+  useEffect(() => {
+    if (show) {
+      console.log(application);
+    }
+  }, [show])
 
   return (
     <>

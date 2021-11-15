@@ -3,76 +3,104 @@ import ApplicationsProvider, { APP_TYPE, IApplication } from "../providers/Appli
 
 import '../styles/globals.scss';
 import { useRouter } from "next/router";
+import Head from "next/head";
 import ApplicationOverview from "../components/Application/ApplicationOverview";
 import Header from '../components/Header/Header';
 import Menu from '../components/Menu/Menu';
+import TicketsProvider from "../providers/TicketProvider";
 
 function createApplication(type: APP_TYPE, environment: string, url: string, poll = true): IApplication {
   return {
     type,
     url,
     environment,
-    configuration: undefined as any,
     poll,
-    failed: false
   }
 }
 
-const applications = [
-  createApplication(APP_TYPE.CUSTOMER_WEB, "dev0", "https://app.dev.inshur.com/int"),
-  createApplication(APP_TYPE.CUSTOMER_WEB, 'test0', "https://app.test.inshur.com/int"),
-  createApplication(APP_TYPE.CUSTOMER_WEB, 'test1', "https://app.test.inshur.com/eu"),
-  createApplication(APP_TYPE.CUSTOMER_WEB, 'test2', "https://app.test.inshur.com/uk"),
-  createApplication(APP_TYPE.CUSTOMER_WEB, 'prod0', "https://app.inshur.com/int"),
-  createApplication(APP_TYPE.CUSTOMER_WEB, 'prod1', "https://app.inshur.com/eu"),
-  createApplication(APP_TYPE.CUSTOMER_WEB, 'prod2', "https://app.inshur.com/uk"),
-
-  createApplication(APP_TYPE.POLICY_ADMIN, "dev0", "https://admin.dev.inshur.com/int"),
-  createApplication(APP_TYPE.POLICY_ADMIN, 'test0', "https://admin.test.inshur.com/int"),
-  createApplication(APP_TYPE.POLICY_ADMIN, 'test1', "https://admin.test.inshur.com/eu"),
-  createApplication(APP_TYPE.POLICY_ADMIN, 'test2', "https://admin.test.inshur.com/uk"),
-  createApplication(APP_TYPE.POLICY_ADMIN, 'prod0', "https://admin.inshur.com/int"),
-  createApplication(APP_TYPE.POLICY_ADMIN, 'prod1', "https://admin.inshur.com/eu"),
-  createApplication(APP_TYPE.POLICY_ADMIN, 'prod2', "https://admin.inshur.com/uk"),
-  //
-  // createApplication(APP_TYPE.PRODUCT_API, "dev0", "https://api.dev.inshur.com/int/product-api", false),
-  // createApplication(APP_TYPE.PRODUCT_API, 'test0', "https://api.test.inshur.com/int/product-api", false),
-  // createApplication(APP_TYPE.PRODUCT_API, 'test1', "https://api.test.inshur.com/eu/product-api", false),
-  // createApplication(APP_TYPE.PRODUCT_API, 'prod0', "https://api.inshur.com/int/product-api", false),
-  // createApplication(APP_TYPE.PRODUCT_API, 'prod1', "https://api.inshur.com/eu/product-api", false),
-  //
-  // createApplication(APP_TYPE.QUOTE_API, "dev0", "https://api.dev.inshur.com/int/quote-api", false),
-  // createApplication(APP_TYPE.QUOTE_API, 'test0', "https://api.test.inshur.com/int/quote-api", false),
-  // createApplication(APP_TYPE.QUOTE_API, 'test1', "https://api.test.inshur.com/eu/quote-api", false),
-  // createApplication(APP_TYPE.QUOTE_API, 'prod0', "https://api.inshur.com/int/quote-api", false),
-  // createApplication(APP_TYPE.QUOTE_API, 'prod1', "https://api.inshur.com/eu/quote-api", false),
-];
-
 const environments = ["dev0", "test0", "test1", "test2", "prod0", "prod1", "prod2"];
+
+interface IAppConfig {
+  subdomain: string;
+  path?: string;
+}
+
+const apps: Record<APP_TYPE, IAppConfig> = {
+  [APP_TYPE.CUSTOMER_WEB]: {
+    subdomain: 'app'
+  },
+  [APP_TYPE.POLICY_ADMIN]: {
+    subdomain: 'admin'
+  },
+  [APP_TYPE.GQL_GATEWAY]: {
+    subdomain: 'api',
+    path: 'gql-gateway'
+  }
+};
+
+const REGIONS = {
+  0: 'int',
+  1: 'eu',
+  2: 'uk'
+}
+
+const applications = Object.entries(apps).reduce((applications, [app, config]) => {
+  const apps = [...applications];
+
+  for (const environment of environments) {
+    const index = environment.search(/\d/);
+    const environmentType = environment.substring(0, index);
+    const environmentNumber = environment.substring(index);
+    const region = REGIONS[environmentNumber];
+
+    if (!region) {
+      continue;
+    }
+
+    const subdomain = environmentType === 'prod' ? config.subdomain : `${config.subdomain}.${environmentType}`;
+
+    const path = config.path ? [region, config.path].join('/') : region;
+
+    const url = `https://${subdomain}.inshur.com/${path}`;
+
+    const application = createApplication(app as APP_TYPE, environment, url);
+
+    apps.push(application);
+  }
+
+  return apps;
+}, [])
 
 function App({ Component }) {
   const { query } = useRouter();
   const { application, environment } = query;
 
   return (
-    <ApplicationsProvider applications={applications} environments={environments}>
-      <Header />
-      <div className="App dark">
-        <Menu />
-        <div className="Page">
-          <div className="flex">
-            <Component />
+    <TicketsProvider>
+      <Head>
+        <title>Houstn</title>
+        <link rel="icon"
+              href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>" />
+      </Head>
+      <ApplicationsProvider applications={applications} environments={environments}>
+        <Header />
+        <div className="App dark">
+          <Menu />
+          <div className="Page">
+            <div className="flex">
+              <Component />
+            </div>
           </div>
         </div>
-      </div>
-      {applications.map(app => (
-        <ApplicationOverview
-          key={`${app.environment}-${app.type}`}
-          application={app.type}
-          environment={app.environment}
-          show={app.type === application as APP_TYPE && environment === app.environment} />
-      ))}
-    </ApplicationsProvider>
+        {applications.map(app => (
+          <ApplicationOverview
+            key={`${app.environment}-${app.type}`}
+            application={app.type}
+            environment={app.environment}
+            show={app.type === application as APP_TYPE && environment === app.environment} />
+        ))}
+      </ApplicationsProvider>
+    </TicketsProvider>
   );
 }
 

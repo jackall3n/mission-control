@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import { orderBy } from 'lodash';
 import { IApplication } from "../../providers/ApplicationsProvider";
 
 interface Props {
   application: IApplication;
 }
 
+const STARRED = ['NBV', 'UKO', 'UKC', "UKR"]
+
 function ApplicationProducts({ application }: Props) {
   const { type, environment } = application;
   const [products, setProducts] = useState<any[]>([]);
+  const [showMore, setShowMore] = useState(false);
 
-  const api = application?.configuration?.api?.base ?? application?.configuration?.api;
-  const region = application?.configuration?.region;
+  const api = application?.metadata?.api;
+  const region = application?.metadata?.region;
 
   useEffect(() => {
     console.log({ api, region }, application)
@@ -24,22 +28,25 @@ function ApplicationProducts({ application }: Props) {
 
       console.log({ json })
 
-      setProducts(json);
+      const ordered = orderBy(json, p => STARRED.indexOf(p.code), 'desc');
+
+      setProducts(ordered);
     })
 
-  }, [api, region])
+  }, [api, region]);
+
+  const filtered = products.filter(p => showMore || STARRED.includes(p.code));
+  const hasMore = products.some(p => !STARRED.includes(p.code));
 
   return (
     <>
-      <h1>
+      <h2>
         Products
-      </h1>
+      </h2>
       <div className="ApplicationOverview-information">
-        {products.map(({ id, name, code, version }) => {
-          const description = name.length > 25 ? `${name.substring(0, 26)}...` : name;
-
+        {filtered.map(({ id, name, code, version }) => {
           return (
-            <div key={id}>
+            <React.Fragment key={id}>
               <strong>
                 <code>
                   {code} (v{version})
@@ -49,7 +56,7 @@ function ApplicationProducts({ application }: Props) {
               <code className="url">
                 <a href={`${application.url}/product/${id}/quote?force=true`}
                    target="_blank"
-                   rel="noreferrer">{description}</a>
+                   rel="noreferrer">{name}</a>
                 {' '}
                 {environment === "dev0" && (
                   <a href={`http://localhost:3000/int/product/${id}/quote?force=true`}
@@ -57,11 +64,15 @@ function ApplicationProducts({ application }: Props) {
                      rel="noreferrer">(local)</a>
                 )}
               </code>
-            </div>
+            </React.Fragment>
           )
         })}
-
       </div>
+
+      <button className="Application-products-show-more" onClick={() => setShowMore(!showMore)} disabled={!hasMore}>
+        {!showMore && 'Show more'}
+        {showMore && 'Show less'}
+      </button>
     </>
   )
 }

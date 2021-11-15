@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { APP_TYPE, IApplication, useApplications } from "../../providers/ApplicationsProvider";
-import DateFormat from "../DateFormat/DateFormat";
-import ReactMarkdown from "react-markdown";
-import visit from 'unist-util-visit';
-import { Node, Parent } from "unist";
+import { TicketIcon } from '@heroicons/react/outline'
+import { useTickets } from "../../providers/TicketProvider";
+import DateFormat from '../DateFormat/DateFormat';
 
 interface Props {
   application: {
@@ -20,130 +19,49 @@ function Application({ application, environment, configuration }: Props) {
   const { id } = application;
   const url = configuration?.url || '#';
 
-  if (configuration?.failed) {
+  const release = `${id}-${configuration?.metadata?.module}`;
+  const [tickets, onRefresh] = useTickets(release);
+
+  useEffect(() => {
+    if (!id || !configuration?.metadata?.module) {
+      return;
+    }
+
+    onRefresh(release);
+  }, [configuration, release, id])
+
+  if (configuration?.error) {
     return (
-      <a className="Application failed" href={url} target="_blank">
+      <a className="Application failed" href={url} target="_blank" title={configuration.error}>
         <h2>Error</h2>
       </a>
     )
   }
 
-  if (application.type === APP_TYPE.CUSTOMER_WEB && configuration?.configuration) {
-    const { version, startupDate, steps, translations, documents, moduleVersion } = configuration.configuration;
-    const deployment = repo.deployments.find(d => d.id === `${id}/${environment}`);
-    const module = repo.modules.find(d => d.id === deployment?.module);
-
-    const githubUrl = `https://github.com/Inshur/inshur-${id}/releases/tag/${version}`;
-    const stepsUrl = `https://github.com/Inshur/inshur-${id}-steps/releases/tag/${steps.version}`;
-    const translationsUrl = `https://github.com/Inshur/inshur-translations/releases/tag/${translations.version}`;
-    const documentsUrl = `https://github.com/Inshur/inshur-${id}-docs/releases/tag/${documents.version}`;
-
-    return (
-      <a className="Application" href={url} target="_blank">
-        <sub><DateFormat value={startupDate} format="dd MMM, HH:mm" /></sub>
-        <h2 className="Application-version">{moduleVersion ?? module?.version ?? "(not provided)"}</h2>
-        <small>Image: <a target="_blank" href={githubUrl}>{version}</a></small>
-        <small>Steps: <a target="_blank" href={stepsUrl}>{steps.version}</a></small>
-        <small>Translations: <a target="_blank" href={translationsUrl}>{translations.version}</a></small>
-        <small>Documents: <a target="_blank" href={documentsUrl}>{documents.version}</a></small>
-      </a>
-    )
-  }
-
-  if (application.type === APP_TYPE.POLICY_ADMIN && configuration?.configuration) {
-    const { version, startupDate, moduleVersion } = configuration.configuration;
-    const deployment = repo.deployments.find(d => d.id === `${id}/${environment}`);
-    const module = repo.modules.find(d => d.id === deployment?.module);
-    const githubUrl = `https://github.com/Inshur/inshur-${id}/releases/tag/${version}`;
-
-    return (
-      <a className="Application" href={url} target="_blank">
-        <sub><DateFormat value={startupDate} format="dd MMM, HH:mm" /></sub>
-        <h2 className="Application-version">{moduleVersion ?? module?.version ?? "(not provided)"}</h2>
-        <small>Image: <a target="_blank" href={githubUrl}>{version}</a></small>
-      </a>
-    )
-  }
-
-  const deployment = repo.deployments.find(d => d.id === `${id}/${environment}`);
-  const module = repo.modules.find(d => d.id === deployment?.module);
-  const githubUrl = `https://github.com/Inshur/inshur-${id}/releases/tag/${module?.tag}`;
-
-  if (!module) {
+  if (!configuration?.metadata) {
     return (<a className="Application empty" href={url}>-</a>);
   }
 
   return (
     <a className="Application" href={url} target="_blank">
-      <h2 className="Application-version">{module?.version ?? "(not provided)"}</h2>
-      <small>Image: <a target="_blank" href={githubUrl}>{module?.tag}</a></small>
-      {module?.readme && (
-        <div className="Application-description">
-          <ReactMarkdown>
-            {module.readme}
-          </ReactMarkdown>
+      <sub><DateFormat value={configuration?.updated} format="dd MMM, HH:mm" /></sub>
+      <h2 className="Application-version">
+        <div>
+          {configuration?.metadata?.module ?? "(not provided)"}
         </div>
-      )}
+
+        <div className="Application-actions">
+          <div className="Application-actions-tickets">
+            <TicketIcon className="Application-actions-tickets-icon" />
+            <div className="Application-actions-tickets-count">{tickets?.length ?? '-'}</div>
+          </div>
+        </div>
+      </h2>
+      {configuration?.metadata?.details.filter(d => d.showOnDeploymentCard === undefined || d.showOnDeploymentCard).map((detail, index) => (
+        <small key={index}>{detail.name}: <a target="_blank" href={detail.link}>{detail.value}</a></small>
+      ))}
     </a>
   )
-}
-
-function jira(options: any) {
-  function transformer(tree: Node, file) {
-    visit(tree, 'text', visitor);
-  }
-
-  function visitor(node: Node, index: number, parent: Parent) {
-    const value = node.value as string;
-    const children = [];
-
-    console.log(node.type);
-
-    if (!/([A-Z]+-[0-9]+)/g.test(value)) {
-      // return [visit.CONTINUE, index];
-    }
-    // return [visit.CONTINUE, index];
-
-    // const replacement = {
-    //   children: []
-    // }
-
-    for (const word of value.split(/([A-Z]+-[0-9]+)/g)) {
-      // if (/([A-Z]+-[0-9]+)/g.test(word)) {
-      //   console.log(word);
-      //   children.push({
-      //     type: 'link',
-      //     url: 'google.com',
-      //     title: word
-      //   })
-      // } else {
-      //   console.log(word);
-      //   children.push({
-      //     type: 'text',
-      //     value: word
-      //   })
-      // }
-    }
-
-    // node.children =  children;
-    //
-    // (parent.children as any)[index] = {
-    //   type: 'link',
-    //   children
-    // }
-
-    // return [visit.SKIP, index]
-
-
-    //
-    // parent.children[index] =
-    //
-    //   // console.log(/([A-Z]+-[0-9]+)/.exec(node.value as string))
-    //
-    //   node.children = children
-  }
-
-  return transformer;
 }
 
 export default Application;

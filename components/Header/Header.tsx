@@ -15,6 +15,7 @@ function Header() {
         </svg>
         <span>Houstn</span>
       </div>
+
       <div className={styles.lastUpdated}>
         <b>updated: </b>
         <DateFormat value={lastUpdated} format="dd MMM HH:mm:ss" />

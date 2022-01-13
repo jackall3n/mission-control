@@ -33,6 +33,10 @@
       margin-right: 1rem;
       width: 24px;
       height: 24px;
+
+      path {
+        fill: var(--main-text-color);
+      }
     }
 
     &:visited {
@@ -41,7 +45,7 @@
 
     &[data-active="true"] {
       svg path {
-        fill: var(--main-blue);
+        fill: var(--primary);
       }
     }
   }

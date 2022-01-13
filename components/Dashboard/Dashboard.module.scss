@@ -80,7 +80,7 @@ $ipad: 760px;
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: rgb(160, 174, 207);
+  color: var(--application-header-text-color);
 
   @include media($ipad) {
     padding-bottom: 0;
@@ -106,13 +106,12 @@ $ipad: 760px;
 .application {
   position: relative;
   background: var(--tile-background);
-  transition: background 0.1s ease-in-out;
+  transition: background 0.1s ease-in-out, opacity 0.1s ease-in-out;
   color: var(--main-text-color);
   border: 2px solid var(--tile-border);
   border-radius: 5px;
   //overflow: hidden;
   display: flex;
-  position: relative;
   z-index: 5;
 
   a {
@@ -120,11 +119,15 @@ $ipad: 760px;
   }
 
   &:hover {
-    background: #fafafa;
+    background: var(--tile-hover-bg-color);
   }
 
   &[data-failed="true"] {
-    border-color: #f39393;
+    border-color: var(--tile-failed-border-color);
+  }
+
+  &[data-empty="true"] {
+    opacity: 0.4;
   }
 
 
@@ -175,7 +178,7 @@ $ipad: 760px;
     right: calc(-1rem - 1.5px);
     top: 0;
     z-index: 0;
-    border-left: 3px solid rgba(216, 216, 216, 0.5);
+    border-left: 3px solid var(--application-divider-bg-color);
     border-radius: 10px;
 
     @include media(1000px) {
@@ -203,15 +206,15 @@ $ipad: 760px;
   font-size: 0.8rem;
   font-weight: 600;
   background: var(--tile-chip-background-color);
-  color: #475264;
+  color: var(--tile-chip-text-color);
   padding: 0.25rem 0.325rem 0.325rem 0.5rem;
   border-bottom-left-radius: 3px;
 
   &[data-failed="true"] {
-    background: #f6a8a8;
-    color: #792b2b;
+    background: var(--tile-chip-failed-background-color);
+    color: var(--tile-chip-failed-text-color);
     border-bottom: 2px solid;
     border-left: 2px solid;
-    border-color: #f39393;
+    border-color: var(--tile-chip-failed-border-color);
   }
 }

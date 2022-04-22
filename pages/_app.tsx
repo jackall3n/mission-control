@@ -54,7 +54,8 @@ const apps: Record<APP_TYPE, IAppConfig> = {
   },
   [APP_TYPE.GQL_GATEWAY]: {
     subdomain: 'api',
-    path: 'gql-gateway'
+    path: 'gql-gateway',
+    environments: ['dev0', 'prod0', 'prod1', 'prod2']
   }
 };
 

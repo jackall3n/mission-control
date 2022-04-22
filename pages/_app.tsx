@@ -34,7 +34,7 @@ function createApplication(type: APP_TYPE, environment: string, url: string, pol
   }
 }
 
-const environments = ["dev0", "test0", "test1", "test2", "prod0", "prod1", "prod2"];
+const environments = ["dev0", /*"test0", "test1", "test2",*/ "prod0", "prod1", "prod2"];
 
 interface IAppConfig {
   subdomain: string;
@@ -54,7 +54,7 @@ const apps: Record<APP_TYPE, IAppConfig> = {
   [APP_TYPE.GQL_GATEWAY]: {
     subdomain: 'api',
     path: 'gql-gateway',
-    environments: ['dev0', 'prod0', 'prod1', 'prod2']
+    // environments: ['dev0', 'prod0', 'prod1', 'prod2']
   }
 };
 

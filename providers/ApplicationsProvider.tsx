@@ -116,6 +116,10 @@ export function ApplicationsProvider({ applications, children, environments }: R
 
       console.log(application, { metadata });
 
+      if (metadata.error) {
+        throw new Error("Failed to get application")
+      }
+
       return {
         ...application,
         error: undefined,

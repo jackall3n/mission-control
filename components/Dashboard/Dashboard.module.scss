@@ -11,7 +11,7 @@ $ipad: 760px;
   padding-top: 1rem;
 
   @include media($max-grid) {
-    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-columns: repeat(3, 1fr) !important;
   }
 
   @include media($ipad) {
@@ -129,7 +129,6 @@ $ipad: 760px;
   &[data-empty="true"] {
     opacity: 0.4;
   }
-
 
   &[data-environment-sub="true"] {
     @include media(1000px) {

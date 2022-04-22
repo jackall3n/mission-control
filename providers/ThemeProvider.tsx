@@ -20,11 +20,11 @@ export const useTheme = () => React.useContext(ThemeContext);
 
 export function ThemeProvider({ children }: React.PropsWithChildren<unknown>) {
   const [theme, setTheme] = useState<IThemeContext["theme"]>(() => {
-    if (typeof localStorage !== "undefined") {
-      return localStorage.getItem("THEME") as Theme ?? Theme.DARK
-    }
+    // if (typeof localStorage !== "undefined") {
+    //   return localStorage.getItem("THEME") as Theme ?? Theme.LIGHT
+    // }
 
-    return Theme.DARK
+    return Theme.LIGHT
   });
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export function ThemeProvider({ children }: React.PropsWithChildren<unknown>) {
     <ThemeContext.Provider value={{
       theme: Theme.LIGHT,
       setTheme(theme) {
-        localStorage.setItem("THEME", theme);
+        localStorage.setItem("THEME", Theme.LIGHT);
 
         setTheme(theme);
       }

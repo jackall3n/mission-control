@@ -4,7 +4,7 @@ import { APP_TYPE, useApplications } from "../../providers/ApplicationsProvider"
 import { groupBy } from 'lodash';
 import Link from 'next/link';
 import Application from '../Application/Application';
-import { Theme, useTheme } from "../../providers/ThemeProvider";
+import { useTheme } from "../../providers/ThemeProvider";
 
 const APPS = Object.values(APP_TYPE).map(type => ({
   id: type,
@@ -27,18 +27,6 @@ function Dashboard() {
           </svg>
           <span>Dashboard</span>
 
-        </div>
-
-        <div className="Dark">
-          <div>
-            Dark:
-          </div>
-
-          <label className="switch">
-            <input type="checkbox" checked={theme === Theme.DARK}
-                   onChange={(e) => setTheme(e.target.checked ? Theme.DARK : Theme.LIGHT)} />
-            <span className="slider round" />
-          </label>
         </div>
       </h1>
       <div className={styles.container} style={{ gridTemplateColumns: `repeat(${environments.length}, 1fr)` }}>
@@ -110,52 +98,21 @@ function Dashboard() {
   )
 }
 
-{/*{environments.map(environment => {*/
-}
-{/*  const application = Object.values(applications).find(a => a.environment === environment && a.type === app.type);*/
-}
-
-{/*  return (*/
-}
-{/*    <React.Fragment key={environment}>*/
-}
-{/*      <Link href={{*/
-}
-{/*        query: {*/
-}
-{/*          application: app.type,*/
-}
-{/*          environment: environment*/
-}
-{/*        }*/
-}
-{/*      }}>*/
-}
-{/*        <div className={styles.application}*/
-}
-{/*             data-environment={environment}*/
-}
-{/*             data-environment-type={environment.replace(/[^A-Za-z]/gmi, '')}*/
-}
-{/*             data-environment-sub={!environment.includes('0')}*/
-}
-{/*             data-failed={application?.failed}>*/
-}
-{/*          <div className={styles.application_environment}*/
-}
-{/*               data-failed={application?.failed}>{environment}</div>*/
-}
-{/*          <Application application={app} environment={environment} configuration={application} />*/
-}
-{/*        </div>*/
-}
-{/*      </Link>*/
-}
-{/*    </React.Fragment>*/
-}
-{/*  )*/
-}
-{/*})*/
-}
-
+/**
+ *
+ *
+ *
+ *         <div className="Dark">
+ *           <div>
+ *             Dark:
+ *           </div>
+ *
+ *           <label className="switch">
+ *             <input type="checkbox" checked={theme === Theme.DARK}
+ *                    onChange={(e) => setTheme(e.target.checked ? Theme.DARK : Theme.LIGHT)} />
+ *             <span className="slider round" />
+ *           </label>
+ *         </div>
+ *
+ */
 export default Dashboard;

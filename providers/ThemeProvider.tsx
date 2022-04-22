@@ -37,7 +37,7 @@ export function ThemeProvider({ children }: React.PropsWithChildren<unknown>) {
 
   return (
     <ThemeContext.Provider value={{
-      theme,
+      theme: Theme.LIGHT,
       setTheme(theme) {
         localStorage.setItem("THEME", theme);
 

@@ -79,12 +79,6 @@ export const ApplicationsContext = React.createContext<IApplicationsContext>({
 
 export const useApplications = () => React.useContext(ApplicationsContext);
 
-export const useApplication = (application: APP_TYPE, environment: string) => {
-  const { applications } = useApplications();
-
-  return Object.values(applications).find(a => a.type === application && a.environment === environment);
-};
-
 interface Props {
   organisation: string;
 }

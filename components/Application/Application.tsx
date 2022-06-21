@@ -59,7 +59,7 @@ function ApplicationContent({ metadata, url, tickets }) {
   const { error, module, updated, details } = metadata;
 
   return (
-    <a className="Application" data-error={!!error} href={url} target="_blank">
+    <a className="Application" data-error={!!error} href={url} target="_blank" rel="noreferrer noopener">
       <sub><DateFormat value={updated?.toDate()} format="dd MMM, HH:mm" /></sub>
       <h2 className="Application-version">
         <div>
@@ -74,7 +74,7 @@ function ApplicationContent({ metadata, url, tickets }) {
         </div>
       </h2>
       {details?.filter(d => d.showOnDeploymentCard === undefined || d.showOnDeploymentCard).map((detail, index) => (
-        <small key={index}>{detail.name}: <a target="_blank" href={detail.link}>{detail.value}</a></small>
+        <small key={index}>{detail.name}: <a target="_blank" rel="noreferrer noopener" href={detail.link}>{detail.value}</a></small>
       ))}
     </a>
   )

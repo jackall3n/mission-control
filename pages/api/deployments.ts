@@ -23,7 +23,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const results = await deployments.get()
   const mapped = results.docs.map(deployment => ({
     ...deployment.data(),
-    update: `http://localhost:7070/api/update?${querystring.stringify(deployment.data())}`
+    update: `/api/update?${querystring.stringify(deployment.data())}`
   }))
 
   try {

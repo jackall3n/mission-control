@@ -36,14 +36,14 @@ function ApplicationOverviewDetails({ id, environment, path }: Props) {
   const [deployment] = useDocument<any>(path, environment);
   const [metadata] = useDocument<any>([path, environment, 'public'], 'metadata');
 
-  if (!deployment || !metadata) {
-    return null;
-  }
-
   const iacUrl = `https://github.com/Inshur/inshur-iac/tree/master/module/app/${id}/${metadata?.module}/values/${environment}.yaml`;
 
   const release = `${id}-${metadata?.module}`;
   const [tickets, , error] = useTickets(release);
+
+  if (!deployment || !metadata) {
+    return null;
+  }
 
   const _id = deployment.ref.parent.parent.id;
   const _environment = deployment.ref.id;
@@ -51,21 +51,21 @@ function ApplicationOverviewDetails({ id, environment, path }: Props) {
   return (
     <>
       <h1>
-        <a href={deployment.url} target="_blank" rel="noreferrer">{_id} ({_environment}) <LinkIcon /></a>
+        <a href={deployment.url} target="_blank" rel="noreferrer noopener">{_id} ({_environment}) <LinkIcon /></a>
       </h1>
       <div className="ApplicationOverview-information">
         <div>
           <strong>Url</strong>
           <span>=</span>
           <code className="url">
-            <a href={deployment.url} target="_blank" rel="noreferrer">{deployment.url}</a>
+            <a href={deployment.url} target="_blank" rel="noreferrer noopener">{deployment.url}</a>
           </code>
         </div>
         <div>
           <strong>Module</strong>
           <span>=</span>
           <code>
-            <a href={iacUrl} target="_blank">{_id}-{metadata?.module}</a>
+            <a href={iacUrl} target="_blank" rel="noreferrer noopener">{_id}-{metadata?.module}</a>
           </code>
         </div>
 
@@ -74,7 +74,7 @@ function ApplicationOverviewDetails({ id, environment, path }: Props) {
             <strong>{detail.name}</strong>
             <span>=</span>
             <code>
-              <a href={detail.link} target="_blank">{detail.value}</a>
+              <a href={detail.link} target="_blank" rel="noreferrer noopener">{detail.value}</a>
             </code>
           </div>
         ))}

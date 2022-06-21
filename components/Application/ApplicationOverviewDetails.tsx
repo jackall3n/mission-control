@@ -1,11 +1,14 @@
 import React from 'react';
-import { APP_TYPE, IApplication } from "../../providers/ApplicationsProvider";
+import { APP_TYPE } from "../../providers/ApplicationsProvider";
 import { useTickets } from "../../providers/TicketProvider";
 import { LinkIcon } from "@heroicons/react/outline";
 import ApplicationProducts from './ApplicationProducts';
+import { useDocument } from "../../hooks/useDocument";
 
 interface Props {
-  application: IApplication;
+  id: string;
+  path: string | string[];
+  environment: string;
 }
 
 function getImage(type) {
@@ -29,38 +32,44 @@ function getImage(type) {
   return type;
 }
 
-function ApplicationOverviewDetails({ application }: Props) {
-  const { type, environment } = application;
+function ApplicationOverviewDetails({ id, environment, path }: Props) {
+  const [deployment] = useDocument<any>(path, environment);
+  const [metadata] = useDocument<any>([path, environment, 'public'], 'metadata');
 
-  const iacUrl = `https://github.com/Inshur/inshur-iac/tree/master/module/app/${type}/${application?.metadata?.module}/values/${environment}.yaml`;
+  if (!deployment || !metadata) {
+    return null;
+  }
 
-  const release = `${type}-${application?.metadata?.module}`;
+  const iacUrl = `https://github.com/Inshur/inshur-iac/tree/master/module/app/${id}/${metadata?.module}/values/${environment}.yaml`;
+
+  const release = `${id}-${metadata?.module}`;
   const [tickets, , error] = useTickets(release);
 
-  const token = localStorage.getItem('API_TOKEN');
+  const _id = deployment.ref.parent.parent.id;
+  const _environment = deployment.ref.id;
 
   return (
     <>
       <h1>
-        <a href={application.url} target="_blank" rel="noreferrer">{type} ({environment}) <LinkIcon /></a>
+        <a href={deployment.url} target="_blank" rel="noreferrer">{_id} ({_environment}) <LinkIcon /></a>
       </h1>
       <div className="ApplicationOverview-information">
         <div>
           <strong>Url</strong>
           <span>=</span>
           <code className="url">
-            <a href={application.url} target="_blank" rel="noreferrer">{application.url}</a>
+            <a href={deployment.url} target="_blank" rel="noreferrer">{deployment.url}</a>
           </code>
         </div>
         <div>
           <strong>Module</strong>
           <span>=</span>
           <code>
-            <a href={iacUrl} target="_blank">{application.type}-{application?.metadata?.module}</a>
+            <a href={iacUrl} target="_blank">{_id}-{metadata?.module}</a>
           </code>
         </div>
 
-        {application?.metadata?.details.map((detail, index) => (
+        {metadata?.details.map((detail, index) => (
           <div key={index}>
             <strong>{detail.name}</strong>
             <span>=</span>
@@ -68,7 +77,6 @@ function ApplicationOverviewDetails({ application }: Props) {
               <a href={detail.link} target="_blank">{detail.value}</a>
             </code>
           </div>
-
         ))}
       </div>
 
@@ -112,7 +120,13 @@ function ApplicationOverviewDetails({ application }: Props) {
         </div>
       </div>
 
-      {type === APP_TYPE.CUSTOMER_WEB && <ApplicationProducts application={application} />}
+      {_id === APP_TYPE.CUSTOMER_WEB &&
+          <ApplicationProducts
+              id={_id}
+              metadata={metadata}
+              environment={_environment}
+              deployment={deployment}
+          />}
     </>
   )
 }

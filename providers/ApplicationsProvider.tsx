@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import qs from 'querystring';
+import { useCollection } from "../hooks/useCollection";
+import { where } from 'firebase/firestore';
 
 export enum APP_TYPE {
   CUSTOMER_WEB = 'customer-web',
@@ -59,23 +61,20 @@ export type IRepo = {
 }
 
 export type IApplicationsContext = {
-  applications: Record<string, IApplication>;
+  applications: Array<{ id: string, name?: string }>;
   fetching: boolean;
   lastUpdated?: Date;
   paused: boolean;
-  repo: IRepo;
-  environments: string[];
+  environments: Array<{ id: string, name?: string }>;
+  organisation: string;
 }
 
 export const ApplicationsContext = React.createContext<IApplicationsContext>({
-  applications: {},
+  applications: [],
   fetching: false,
   paused: false,
-  repo: {
-    deployments: [],
-    modules: []
-  },
-  environments: []
+  environments: [],
+  organisation: ''
 });
 
 export const useApplications = () => React.useContext(ApplicationsContext);
@@ -87,18 +86,13 @@ export const useApplication = (application: APP_TYPE, environment: string) => {
 };
 
 interface Props {
-  applications: IApplication[];
-  environments: string[];
+  organisation: string;
 }
 
-export function ApplicationsProvider({ applications, children, environments }: React.PropsWithChildren<Props>) {
-  const [repo, setRepo] = useState<IRepo>({ deployments: [], modules: [] });
-  const [apps, setApps] = useState<Record<string, IApplication>>(() => {
-    return applications.reduce((apps, a) => ({
-      [a.url]: a,
-      ...apps
-    }), {})
-  });
+export function ApplicationsProvider({ children, organisation }: React.PropsWithChildren<Props>) {
+  const [applications] = useCollection(['organisations', organisation, 'applications'], where('active', '==', true));
+  const [environments] = useCollection(['organisations', organisation, 'environments']);
+
   const [paused, setPaused] = useState<boolean>(false);
   const [fetching, setFetching] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
@@ -146,13 +140,13 @@ export function ApplicationsProvider({ applications, children, environments }: R
 
     const failed = Boolean(Object.values(app.configuration ?? {}).length === 0);
 
-    setApps(apps => ({
-      ...apps,
-      [app.url]: {
-        ...app,
-        failed,
-      }
-    }))
+    // setApps(apps => ({
+    //   ...apps,
+    //   [app.url]: {
+    //     ...app,
+    //     failed,
+    //   }
+    // }))
 
     setLastUpdated(new Date());
   }
@@ -161,8 +155,8 @@ export function ApplicationsProvider({ applications, children, environments }: R
     console.log("REFRESHING");
 
     for (const application of applications) {
-      get(application)
-        .then(handle)
+      // get(application)
+      //   .then(handle)
     }
 
     setFetching(false);
@@ -171,46 +165,46 @@ export function ApplicationsProvider({ applications, children, environments }: R
   }
 
 
-  useEffect(() => {
-    refresh().then();
-    let interval = setInterval(refresh, 5000);
-
-    function onFocus() {
-      if (!interval) {
-        refresh().then();
-        interval = setInterval(refresh, 5000);
-        setPaused(false);
-      }
-    }
-
-    function onBlur() {
-      if (interval) {
-        clearInterval(interval);
-        interval = undefined;
-        setPaused(true);
-      }
-    }
-
-    window.addEventListener('focus', onFocus);
-    window.addEventListener('blur', onBlur);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('focus', onFocus);
-      window.removeEventListener('blur', onBlur);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   refresh().then();
+  //   let interval = setInterval(refresh, 5000);
+  //
+  //   function onFocus() {
+  //     if (!interval) {
+  //       refresh().then();
+  //       interval = setInterval(refresh, 5000);
+  //       setPaused(false);
+  //     }
+  //   }
+  //
+  //   function onBlur() {
+  //     if (interval) {
+  //       clearInterval(interval);
+  //       interval = undefined;
+  //       setPaused(true);
+  //     }
+  //   }
+  //
+  //   window.addEventListener('focus', onFocus);
+  //   window.addEventListener('blur', onBlur);
+  //
+  //   return () => {
+  //     clearInterval(interval);
+  //     window.removeEventListener('focus', onFocus);
+  //     window.removeEventListener('blur', onBlur);
+  //   }
+  //
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return (
     <ApplicationsContext.Provider value={{
-      applications: apps,
+      applications,
       fetching,
       lastUpdated,
       paused,
-      repo,
       environments,
+      organisation,
     }}>
       {children}
     </ApplicationsContext.Provider>

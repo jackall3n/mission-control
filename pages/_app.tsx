@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ApplicationsProvider, { APP_TYPE, IApplication } from "../providers/ApplicationsProvider";
-import { initializeApp } from "firebase/app";
-import { Analytics, getAnalytics, logEvent } from "firebase/analytics";
+import { logEvent } from "firebase/analytics";
 
 import '../styles/globals.scss';
 import { useRouter } from "next/router";
@@ -11,19 +10,9 @@ import Header from '../components/Header/Header';
 import Menu from '../components/Menu/Menu';
 import TicketsProvider from "../providers/TicketProvider";
 import ThemeProvider from "../providers/ThemeProvider";
+import app from '../firebase/app';
+import { useAnalytics } from '../hooks/useAnalytics';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB2YXgcUob-R1g_Vh_AsZ1V5nWlVmFsUhA",
-  authDomain: "houstn-io.firebaseapp.com",
-  projectId: "houstn-io",
-  storageBucket: "houstn-io.appspot.com",
-  messagingSenderId: "978691732275",
-  appId: "1:978691732275:web:5e5041fcfbd14261d68446",
-  measurementId: "G-FZZTVD9K5R"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
 
 function createApplication(type: APP_TYPE, environment: string, url: string, poll = true): IApplication {
   return {
@@ -95,22 +84,11 @@ const applications = Object.entries(apps).reduce((applications, [app, config]) =
   return apps;
 }, [])
 
-function useAnalytics() {
-  const [analytics, setAnalytics] = useState<Analytics>();
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setAnalytics(getAnalytics(app))
-    }
-
-  }, [])
-
-  return analytics;
-}
 
 function App({ Component }) {
   const { query } = useRouter();
-  const { application, environment } = query;
+  const { application, environment, organisation } = query;
+
   const analytics = useAnalytics();
 
   useEffect(() => {
@@ -142,28 +120,21 @@ function App({ Component }) {
           <link rel="icon"
                 href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>" />
         </Head>
-        <ApplicationsProvider applications={applications} environments={environments}>
+        <ApplicationsProvider organisation={organisation as string}>
           <Header />
           <div className="App">
-            <Menu />
+            <Menu organisation={organisation} />
             <div className="Page">
               <div className="flex">
                 <Component />
               </div>
             </div>
           </div>
-          {applications.map(app => (
-            <ApplicationOverview
-              key={`${app.environment}-${app.type}`}
-              application={app.type}
-              environment={app.environment}
-              show={app.type === application as APP_TYPE && environment === app.environment} />
-          ))}
+          <ApplicationOverview />
         </ApplicationsProvider>
       </TicketsProvider>
-
     </ThemeProvider>
   );
 }
 
-export default App;
+export default App

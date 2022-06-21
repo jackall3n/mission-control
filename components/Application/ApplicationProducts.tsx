@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { orderBy } from 'lodash';
-import { IApplication } from "../../providers/ApplicationsProvider";
 
 interface Props {
-  application: IApplication;
+  id: string;
+  metadata?: any;
+  environment: string;
+  deployment: any;
 }
 
 const STARRED = ['NBV', 'UKO', 'UKC', "UKR"]
 
-function ApplicationProducts({ application }: Props) {
-  const { type, environment } = application;
+function ApplicationProducts({ id, metadata, deployment, environment }: Props) {
   const [products, setProducts] = useState<any[]>([]);
   const [showMore, setShowMore] = useState(false);
 
-  const api = application?.metadata?.api;
-  const region = application?.metadata?.region;
+  const api = metadata?.api;
+  const region = metadata?.region;
 
   useEffect(() => {
-    console.log({ api, region }, application)
+    console.log({ api, region }, id)
 
     if (!api || !region) {
       return
@@ -54,7 +55,7 @@ function ApplicationProducts({ application }: Props) {
               </strong>
               <span>=</span>
               <code className="url">
-                <a href={`${application.url}/product/${id}/quote?force=true`}
+                <a href={`${deployment.url}/product/${id}/quote?force=true`}
                    target="_blank"
                    rel="noreferrer">{name}</a>
                 {' '}

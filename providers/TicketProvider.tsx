@@ -113,7 +113,7 @@ export const useTickets = (release: string): [ITicket[], (release: string) => vo
 };
 
 export function TicketsProvider({ children }: React.PropsWithChildren<unknown>) {
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<string>('Nothing to show 🤔');
   const [releases, setReleases] = useState<Record<string, IRelease>>({});
 
   async function getTickets(release: string) {

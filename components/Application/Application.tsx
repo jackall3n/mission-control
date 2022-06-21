@@ -1,53 +1,69 @@
-import React, { useEffect } from 'react';
-import { APP_TYPE, IApplication, useApplications } from "../../providers/ApplicationsProvider";
+import React from 'react';
 import { TicketIcon } from '@heroicons/react/outline'
 import { useTickets } from "../../providers/TicketProvider";
 import DateFormat from '../DateFormat/DateFormat';
+import { useDocument } from "../../hooks/useDocument";
+import styles from "../Dashboard/Dashboard.module.scss";
+import Link from 'next/link';
 
 interface Props {
+  index: number
+  path: string;
+  organisation: string;
   application: {
     id: string;
     name: string;
-    type: APP_TYPE;
   };
-  environment: string;
-  configuration?: IApplication;
+  environment: { id: string };
 }
 
-function Application({ application, environment, configuration }: Props) {
-  const { repo } = useApplications();
-  const { id } = application;
-  const url = configuration?.url || '#';
+function Application({ path, organisation, application, environment, index }: Props) {
+  const [deployment] = useDocument<any>(path, environment.id);
+  const [metadata] = useDocument<any>([path, environment.id, 'public'], 'metadata');
 
-  const release = `${id}-${configuration?.metadata?.module}`;
-  const [tickets, onRefresh] = useTickets(release);
+  const url = deployment?.url || '#';
 
-  useEffect(() => {
-    if (!id || !configuration?.metadata?.module) {
-      return;
-    }
+  const [tickets, onRefresh] = useTickets(`${application.id}-${metadata?.module}`);
 
-    onRefresh(release);
-  }, [configuration, release, id])
+  return (
+    <Link scroll={false} href={{
+      pathname: organisation,
+      query: {
+        application: application.id,
+        environment: environment.id
+      }
+    }}>
+      <div className={styles.application}
+           data-environment={environment.id}
+           data-empty={!deployment}
+           data-environment-type={environment.id.replace(/[^A-Za-z]/gmi, '')}
+           data-environment-sub={!environment.id.includes('0') && environment.id !== 'prod1'}
+           data-failed={!!metadata?.error}
+           style={{
+             transform: `translate(${index * 0.325}rem, ${index * 0.325}rem)`,
+             zIndex: 5 - index
+           }}
+      >
+        <div className={styles.application_environment} data-failed={!!metadata?.error}>{environment.id}</div>
+        <ApplicationContent metadata={metadata} url={url} tickets={tickets} />
+      </div>
+    </Link>
+  )
+}
 
-  if (configuration?.error) {
-    return (
-      <a className="Application failed" href={url} target="_blank" title={configuration.error}>
-        <h2>Error</h2>
-      </a>
-    )
-  }
-
-  if (!configuration?.metadata) {
+function ApplicationContent({ metadata, url, tickets }) {
+  if (!metadata) {
     return (<a className="Application empty" href={url}>-</a>);
   }
 
+  const { error, module, updated, details } = metadata;
+
   return (
-    <a className="Application" href={url} target="_blank">
-      <sub><DateFormat value={configuration?.updated} format="dd MMM, HH:mm" /></sub>
+    <a className="Application" data-error={!!error} href={url} target="_blank">
+      <sub><DateFormat value={updated?.toDate()} format="dd MMM, HH:mm" /></sub>
       <h2 className="Application-version">
         <div>
-          {configuration?.metadata?.module ?? "(not provided)"}
+          {module ?? "(not provided)"}
         </div>
 
         <div className="Application-actions">
@@ -57,7 +73,7 @@ function Application({ application, environment, configuration }: Props) {
           </div>
         </div>
       </h2>
-      {configuration?.metadata?.details.filter(d => d.showOnDeploymentCard === undefined || d.showOnDeploymentCard).map((detail, index) => (
+      {details?.filter(d => d.showOnDeploymentCard === undefined || d.showOnDeploymentCard).map((detail, index) => (
         <small key={index}>{detail.name}: <a target="_blank" href={detail.link}>{detail.value}</a></small>
       ))}
     </a>

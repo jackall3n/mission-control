@@ -1,18 +1,12 @@
 import React from 'react';
 import styles from './Dashboard.module.scss';
-import { APP_TYPE, useApplications } from "../../providers/ApplicationsProvider";
+import { useApplications } from "../../providers/ApplicationsProvider";
 import { groupBy } from 'lodash';
-import Link from 'next/link';
 import Application from '../Application/Application';
 import { useTheme } from "../../providers/ThemeProvider";
+import { useCollection } from "../../hooks/useCollection";
 
-const APPS = Object.values(APP_TYPE).map(type => ({
-  id: type,
-  name: type.replace('-', ' '),
-  type
-}))
-
-function Dashboard() {
+function Dashboard({ organisation }) {
   const { applications, lastUpdated, paused, environments } = useApplications();
 
   const { theme, setTheme } = useTheme();
@@ -30,89 +24,65 @@ function Dashboard() {
         </div>
       </h1>
       <div className={styles.container} style={{ gridTemplateColumns: `repeat(${environments.length}, 1fr)` }}>
-        {/* APPLICATIONS */}
-        {APPS.map(app => (
-          <div className={styles.application_row} key={app.id}>
-            <div className={styles.application_header}>
-              <span>{app.name}</span>
-            </div>
-            <div className={styles.application_environments}>
-              {Object.entries(groupBy(environments, e => {
-                if (e === "prod0") {
-                  return e;
-                }
-
-                return e.replace(/[^A-Za-z]/gmi, '');
-              })).map(([environmentType, environments]) => {
-
-                return (
-                  <div data-environment-type={environmentType} key={environmentType}
-                       className={styles.environment_type}
-                       style={{
-                         gridColumn: `span ${environments.length}`,
-                         gridTemplateColumns: `repeat(${environments.length}, 1fr)`
-                       }}
-                  >
-                    <>
-                      {environments.map((environment, index) => {
-                        const application = Object.values(applications).find(a => a.environment === environment && a.type === app.type);
-
-                        return (
-                          <React.Fragment key={environment}>
-                            <Link scroll={false} href={{
-                              query: {
-                                application: app.type,
-                                environment: environment
-                              }
-                            }}>
-                              <div className={styles.application}
-                                   data-environment={environment}
-                                   data-empty={!application?.metadata}
-                                   data-environment-type={environment.replace(/[^A-Za-z]/gmi, '')}
-                                   data-environment-sub={!environment.includes('0') && environment !== 'prod1'}
-                                   data-failed={!!application?.error}
-                                   style={{
-                                     transform: `translate(${index * 0.325}rem, ${index * 0.325}rem)`,
-                                     zIndex: 5 - index
-                                   }}
-                              >
-                                <div className={styles.application_environment}
-                                     data-failed={!!application?.error}>{environment}</div>
-                                <Application application={app} environment={environment} configuration={application} />
-                              </div>
-                            </Link>
-                          </React.Fragment>
-                        )
-                      })}
-                    </>
-                  </div>
-                )
-              })}
-            </div>
-            <div className={styles.application_row_spacer} />
-          </div>
+        {applications.map(application => (
+          <ApplicationRow key={application.id}
+                          application={application}
+                          environments={environments}
+                          organisation={organisation.id}
+          />
         ))}
-
       </div>
     </div>
   )
 }
 
-/**
- *
- *
- *
- *         <div className="Dark">
- *           <div>
- *             Dark:
- *           </div>
- *
- *           <label className="switch">
- *             <input type="checkbox" checked={theme === Theme.DARK}
- *                    onChange={(e) => setTheme(e.target.checked ? Theme.DARK : Theme.LIGHT)} />
- *             <span className="slider round" />
- *           </label>
- *         </div>
- *
- */
+function ApplicationRow({ application, environments, organisation }) {
+  const { name } = application;
+
+  const [deployments, collection] = useCollection(['organisations', organisation, 'applications', application.id, 'deployments'])
+
+  console.log({ deployments });
+
+  return (
+    <div className={styles.application_row}>
+      <div className={styles.application_header}>
+        <span>{name ?? application.id}</span>
+      </div>
+      <div className={styles.application_environments}>
+        {Object.entries(groupBy(environments, e => {
+          if (e.id === "prod0") {
+            return e;
+          }
+
+          return e.id.replace(/[^A-Za-z]/gmi, '');
+        })).map(([environmentType, environments]) => {
+
+          return (
+            <div data-environment-type={environmentType} key={environmentType}
+                 className={styles.environment_type}
+                 style={{
+                   gridColumn: `span ${environments.length}`,
+                   gridTemplateColumns: `repeat(${environments.length}, 1fr)`
+                 }}
+            >
+              <>
+                {environments.map((environment, index) => (
+                  <Application index={index}
+                               key={environment.id}
+                               path={collection.path}
+                               organisation={organisation}
+                               application={application}
+                               environment={environment}
+                  />
+                ))}
+              </>
+            </div>
+          )
+        })}
+      </div>
+      <div className={styles.application_row_spacer} />
+    </div>
+  )
+}
+
 export default Dashboard;

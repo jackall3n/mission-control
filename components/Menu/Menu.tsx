@@ -2,11 +2,11 @@ import React from 'react';
 import styles from './Menu.module.scss';
 import NavLink from "../Router/NavLink";
 
-function Menu() {
+function Menu({ organisation }) {
   return (
     <aside className={styles.menu}>
       <nav className={styles.navigation}>
-        <NavLink href="/">
+        <NavLink href={`/${organisation}`}>
           <a>
             <svg xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd" viewBox="0 0 24 24">
               <path
@@ -16,7 +16,7 @@ function Menu() {
           </a>
         </NavLink>
 
-        <NavLink href="/settings">
+        <NavLink href={`/${organisation}/settings`}>
           <a>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <path

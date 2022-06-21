@@ -124,6 +124,7 @@ $ipad: 760px;
 
   &[data-failed="true"] {
     border-color: var(--tile-failed-border-color);
+    background-color: var(--tile-failed-background-color);
   }
 
   &[data-empty="true"] {

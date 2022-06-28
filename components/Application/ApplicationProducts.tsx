@@ -31,22 +31,34 @@ function useProducts({ api, region }) {
 
 function ApplicationProducts({ id, metadata, deployment, environment }: Props) {
   const [showMore, setShowMore] = useState(false);
-  const [starred, setStarred] = useState(STARRED);
+  const [starred, setStarred] = useState<string[]>([]);
 
   const api = metadata?.api;
   const region = metadata?.region;
 
   const [products = [], loading] = useProducts({ api, region });
 
+  useEffect(() => {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    const value = localStorage.getItem('STARRED');
+
+    setStarred(value ? JSON.parse(value) : STARRED);
+  }, [])
+
   function toggleStar(event: MouseEvent<HTMLButtonElement>, code: string) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (starred.includes(code)) {
-      setStarred(starred.filter(s => s !== code));
-    } else {
-      setStarred([...starred, code]);
-    }
+    const updated = starred.includes(code)
+      ? starred.filter(s => s !== code)
+      : [...starred, code]
+
+    setStarred(updated);
+
+    localStorage.setItem('STARRED', JSON.stringify(updated));
   }
 
   useEffect(() => {

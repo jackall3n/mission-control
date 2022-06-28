@@ -8,9 +8,10 @@ export interface NavLinkProps extends LinkProps {
 
 function NavLink({ children, href, ...props }: NavLinkProps) {
   const router = useRouter()
+
   return (
     <Link href={href} {...props}>
-      {router.pathname === href ? React.cloneElement(children, { 'data-active': true }) : children}
+      {router.asPath === href ? React.cloneElement(children, { 'data-active': true }) : children}
     </Link>
   )
 }

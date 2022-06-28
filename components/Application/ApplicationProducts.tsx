@@ -15,7 +15,7 @@ interface Props {
 const STARRED = ['NBV', "UKO", "UKR", "UKC", "UKA"];
 
 function useProducts({ api, region }) {
-  const { data: products, isValidating } = useSWR('/products', async () => {
+  const { data: products, isValidating } = useSWR({ url: 'products', api, region }, async () => {
     const { data } = await axios.get(`/api/products`, {
       params: {
         api,

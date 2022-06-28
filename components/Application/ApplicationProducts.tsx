@@ -75,7 +75,7 @@ function ApplicationProducts({ id, metadata, deployment, environment }: Props) {
       starred: starred.includes(product.code)
     }))
 
-    const ordered = orderBy(mapped, [p => p.starred, p => p.name, p => p.version], ['desc', 'asc', 'desc']);
+    const ordered = orderBy(mapped, [p => p.name, p => p.version], ['asc', 'desc']);
     const filtered = ordered.filter(p => showMore || p.starred);
     const hasMore = ordered.some(p => !p.starred);
 
